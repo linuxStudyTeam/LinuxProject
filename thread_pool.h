@@ -1,8 +1,8 @@
 #ifndef THREAD_POOL_H_INCLUDED
 #define THREAD_POOL_H_INCLUDED 
 #include "wrapper.h"
-
-#define SIZE_OF_POOL 10
+#include "weblet.h"
+#define SIZE_OF_POOL 4
 typedef struct {
     int *socks;         /* 定义指针，指向用于初始化的线程池的数组空间（一般存放socket值） */         
     int cnt;            /* 线程池的线程数 */

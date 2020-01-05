@@ -46,12 +46,19 @@ int release_thread_of_pool(thread_pool *tp)
 void *process_thread_function(void *arg)
 {
 	int conn_sock ;
-   extern thread_pool tp;
-       	pthread_detach(pthread_self()); 
+    extern thread_pool tp;
+	extern struct hostent *hp;
+	extern char *haddrp;
+	extern struct sockaddr_in clientaddr;
+    pthread_detach(pthread_self()); 
     while (1) { 
 	    conn_sock=release_thread_of_pool(&tp);   /* Remove a task from task pool */
-	    //toggle(conn_sock);            /* Serve client */
-	    printf("------%d-------\n",conn_sock);
+	    process_trans(conn_sock);            /* Serve client */
+	   // printf("------%d-------\n",conn_sock);
+    	hp = Gethostbyaddr((const char *)&clientaddr.sin_addr.s_addr, sizeof(clientaddr.sin_addr.s_addr), AF_INET);
+	    haddrp = inet_ntoa(clientaddr.sin_addr);
+	    printf("%lu connecte to %s (%s)\n",pthread_self(), hp->h_name, haddrp);
+	    //sleep(5);
 	    close(conn_sock);
     }
 
