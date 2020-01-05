@@ -49,16 +49,19 @@ void *process_thread_function(void *arg)
     extern thread_pool tp;
 	extern struct hostent *hp;
 	extern char *haddrp;
-	extern struct sockaddr_in clientaddr;
-    pthread_detach(pthread_self()); 
+    /*
+		joinable 当线程函数自己返回退出时或pthread_exit时都不会释放线程所占用堆栈和线程描述符（总计8K多），
+				 只有调用了pthread_join之后这些资源才会被释放
+		unjoinable 这些资源在线程函数退出时或pthread_exit时自动会被释放
+		用pthread_create 函数创建线程可以指定转态，但本项目没有指定，而是采用pthread_detach函数来改变状态
+		pthread_self 获得本身线程id
+    */
+    pthread_detach(pthread_self());  //将线程的状态从joinable状态改为unjoinable状态，确保资源的释放
+
     while (1) { 
-	    conn_sock=release_thread_of_pool(&tp);   /* Remove a task from task pool */
-	    process_trans(conn_sock);            /* Serve client */
-	   // printf("------%d-------\n",conn_sock);
-    	hp = Gethostbyaddr((const char *)&clientaddr.sin_addr.s_addr, sizeof(clientaddr.sin_addr.s_addr), AF_INET);
-	    haddrp = inet_ntoa(clientaddr.sin_addr);
+	    conn_sock=release_thread_of_pool(&tp);   /* 从线程池中挑选出当前线程，并返回该线程所存储的sock值 */
+	    process_trans(conn_sock);            /* 业务处理函数 */
 	    printf("%lu connecte to %s (%s)\n",pthread_self(), hp->h_name, haddrp);
-	    //sleep(5);
 	    close(conn_sock);
     }
 

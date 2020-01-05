@@ -32,7 +32,7 @@ void pool_init(thread_pool *tp, int n);
 void pool_destroy(thread_pool *tp);
 
 /*
-	使用线程池中的某个线程
+	使用线程池中的某个线程，将item（本项目是sock值）值赋给该线程
 	@oaram:
 		*tp: 线程池结构体对象指针
 		item: socket值
@@ -40,7 +40,7 @@ void pool_destroy(thread_pool *tp);
 void use_thread_of_pool(thread_pool *tp, int item);
 
 /*
-	释放线程池中的某个正被使用的线程
+	获取线程池中当前线程所存储的sock值（这里并没有做销毁线程的操作，只是指针偏移了，而线程销毁是等待它自然销毁）
 	@oaram:
 		*tp: 线程池结构体对象指针
 */
@@ -53,4 +53,5 @@ int release_thread_of_pool(thread_pool *tp);
 		*arg: 指向线程所传入的参数
 */
 void *process_thread_function(void *arg);
+
 #endif
