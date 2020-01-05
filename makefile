@@ -8,7 +8,6 @@ thread_pool.o: thread_pool.c
 	${CC} -c $< -o $@  
 webletfunc.o: webletfun.c
 	${CC} -c $< -o $@ 
-
 .PHONY:clean
 clean:
 	rm *.o weblet
