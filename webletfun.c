@@ -12,6 +12,7 @@ void process_trans(int fd){
         rio_readinitb(&rio,fd);
         rio_readlineb(&rio,buf,MAXLINE);
         sscanf(buf,"%s %s %s\n",method,uri,version);
+        // strcasecmp 忽略大小写比较字符串
         if(strcasecmp(method,"GET")){
                 error_request(fd,method,"501","Not Implemented","weblet does not implement this method");
                 return;
@@ -80,7 +81,7 @@ void parse_static_uri(char *uri,char *filename)
         strcpy(filename,".");
         strcat(filename,uri);
         if(uri[strlen(uri)-1]=='/')
-                strcat(filename,"home.html");
+                strcat(filename,"./WEB/home.html");
 }
 
 void parse_dynamic_uri(char *uri,char *filename,char *cgiargs){
