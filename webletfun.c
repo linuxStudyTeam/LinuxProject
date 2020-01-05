@@ -20,9 +20,12 @@ void process_trans(int fd){
         read_requesthdrs(&rio);
 
         static_flag=is_static(uri);
+
         if(static_flag){
+               // printf("静态页面%d\n",static_flag);
                 parse_static_uri(uri,filename);
         }else{
+              //  printf("动态页面%d\n",static_flag);
                 parse_dynamic_uri(uri,filename,cgiargs);
         }
 
@@ -109,13 +112,16 @@ void feed_static(int fd,char *filename,int filesize)
         sprintf(buf,"%sContent-length:%d\r\n",buf,filesize);
         sprintf(buf,"%sContent-type:%s\r\n",buf,filetype);
         rio_writen(fd,buf,strlen(buf));
-
+       // printf("文件名%s\n", filename);
         /*send response body to client*/
         srcfd=open(filename,O_RDONLY,0);
+        //printf("%d\n", filesize);
+
         srcp=mmap(0,filesize,PROT_READ,MAP_PRIVATE,srcfd,0);
         close(srcfd);
         rio_writen(fd,srcp,filesize);
         munmap(srcp,filesize);
+
 }
 /*get_filetype-derive file type from file name*/
 void get_filetype(char *filename,char *filetype){
@@ -127,6 +133,7 @@ void get_filetype(char *filename,char *filetype){
                 strcpy(filename,"video/mpeg");
         else
                 strcpy(filetype,"text/html");
+       // printf("%s\n", filetype);
 }
 
 
