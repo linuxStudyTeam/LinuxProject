@@ -2,13 +2,15 @@
 #include "weblet.h"
 
 thread_pool tp; // 声明为外部变量
+struct hostent *hp;
+char *haddrp;
+struct sockaddr_in clientaddr;
 int main(int argc, char **argv)
 {
 	int listen_sock,conn_sock,port,clientlen,i;
-	struct sockaddr_in clientaddr;
+
 	pthread_t tid; // 定义线程变量
-	struct hostent *hp;
-	char *haddrp;
+
 	pool_init(&tp, SIZE_OF_POOL); // 初始化线程池
 
 	/*cheek command line args*/
@@ -24,15 +26,12 @@ int main(int argc, char **argv)
 	while(1){
 		clientlen = sizeof(clientaddr);
 		conn_sock = accept(listen_sock,(SA *)&clientaddr,&clientlen);
-		process_trans(conn_sock);
+		//printf("now: %d\n", conn_sock);
 
-		hp = Gethostbyaddr((const char *)&clientaddr.sin_addr.s_addr, 
-			   sizeof(clientaddr.sin_addr.s_addr), AF_INET);
-	    haddrp = inet_ntoa(clientaddr.sin_addr);
-	    printf("server connected to %s (%s)\n", hp->h_name, haddrp);
 
+//printf("test\n");
 	    use_thread_of_pool(&tp, conn_sock);  /* Insert conn_sock in task pool */
-		close(conn_sock);
+		//close(conn_sock);
 	}
 	
 }
