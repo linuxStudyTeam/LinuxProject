@@ -1,3 +1,4 @@
+#include "weblet.h"
 /*weblet 事务处理函数process_trans的源代码,位于weblet.c中*/
 
 void process_trans(int fd){
@@ -81,7 +82,7 @@ void parse_static_uri(char *uri,char *filename)
 
 void parse_dynamic_uri(char *uri,char *filename,char *cgiargs){
         char *ptr;
-        ptr = index(uri,"?");
+        ptr = index(uri,'?');
         if(ptr){
                 strcpy(cgiargs,ptr+1);
                 *ptr='\0';
@@ -125,7 +126,6 @@ void get_filetype(char *filename,char *filetype){
         else if(strstr(filename,".mpeg"))
                 strcpy(filename,"video/mpeg");
         else
-                                                                                                                                                                                               149,1-8       67%
                 strcpy(filetype,"text/html");
 }
 
@@ -143,7 +143,6 @@ void feed_dynamic(int fd,char *filename,char *cgiargs)
         rio_writen(fd,buf,strlen(buf));
         sprintf(buf,"Server:weblet Web Server\r\n");
         rio_writen(fd,buf,strlen(buf));
-
         pipe(pfd);
         if(fork()==0){
                 close(pfd[1]);
@@ -169,7 +168,6 @@ void error_request(int fd,char *cause,char *errnum,char *shortmsg,char *descript
         sprintf(body,"%s<body bgcolor=""ffffff"">\r\n",body);
         sprintf(body,"%s %s:%s\r\n",body,errnum,shortmsg);
         sprintf(body,"%s<p>%s:%s\r\n",body,description,cause);
-                                                                                                                                                                                               192,1-8       93%
         /*send the http respose*/
         sprintf(buf,"HTTP/1.0 %s %s\r\n",errnum,shortmsg);
         rio_writen(fd,buf,strlen(buf));
@@ -177,6 +175,6 @@ void error_request(int fd,char *cause,char *errnum,char *shortmsg,char *descript
         rio_writen(fd,buf,strlen(buf));
         sprintf(buf,"Content-length: %d\r\n\r\n",(int)strlen(body));
         rio_writen(fd,buf,strlen(buf));
-        rip_writen(fd,body,strlen(body));
+        rio_writen(fd,body,strlen(body));
 }
 
