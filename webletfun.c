@@ -12,7 +12,9 @@ void process_trans(int fd){
         rio_readinitb(&rio,fd);
         rio_readlineb(&rio,buf,MAXLINE);
         sscanf(buf,"%s %s %s\n",method,uri,version);
-        printf("%s\n", method);
+        //printf("123:%s\n", buf);
+        rio_readlineb(&rio,buf,MAXLINE);
+
         // strcasecmp 忽略大小写比较字符串 相等返回0
         if(!strcasecmp(method,"GET")){
             // GET请求代码
@@ -25,7 +27,9 @@ void process_trans(int fd){
             }else{
                   //  printf("动态页面%d\n",static_flag);
                     parse_dynamic_uri(uri,filename,cgiargs);
+
             }
+            // stat 获取文本信息
             if(stat(filename,&sbuf)<0){
                     error_request(fd,filename,"404","Not Found","weblet could not find this file");
                     return;
@@ -44,15 +48,35 @@ void process_trans(int fd){
                     feed_dynamic(fd,filename,cgiargs);
             }
 
-        }else if (!strcasecmp(method,"POST"))
-        {
-            // POST请求代码
-            printf("12321\n");
-        }else{
+        }else if (!strcasecmp(method,"POST")){
+       
+           //printf("123: %s\n", rio.rio_buf);
+           deal_parm_post(rio.rio_buf,cgiargs);
+          // printf("------:%d\n", rio.rio_cnt);
+          // printf("%s, %d", rio.rio_buf, strlen(rio.rio_buf));
+  
+            // stat 获取文本信息
+            /*if(stat(filename,&sbuf)<0){
+                    error_request(fd,filename,"404","Not Found","weblet could not find this file");
+                    return;
+            }
+            
+            if(!(S_ISREG(sbuf.st_mode))||!(S_IRUSR & sbuf.st_mode)){
+                    error_request(fd,filename,"403","Forbidden","weblet is not permtted to read the file");
+                    return;
+            }  
+            if(fork()==0){ // 子进程
+                    printf("创建子进程\n");
+                    execve("./test",NULL,environ);
+            }
+            wait(NULL);   /* parent waits for and reaps child
+            printf("运行结束\n");*/
+            // }else{
 
-            error_request(fd,method,"501","Not Implemented","weblet does not implement this method");
-            return;
-        }
+               /* error_request(fd,method,"501","Not Implemented","weblet does not implement this method");
+                return;
+            }*/
+       }
 
         
 }
@@ -75,14 +99,13 @@ int is_static(char *uri){
 
 void read_requesthdrs(rio_t *rp)
 {
-        char buf[MAXLINE];
-
+    char buf[MAXLINE];
+    rio_readlineb(rp,buf,MAXLINE);
+    while(strcmp(buf,"\r\n")){
+        printf("%s",buf);
         rio_readlineb(rp,buf,MAXLINE);
-        while(strcmp(buf,"\r\n")){
-                printf("%s",buf);
-                rio_readlineb(rp,buf,MAXLINE);
-        }
-        return;
+    }
+    return;
 }
 
 
@@ -110,7 +133,7 @@ void parse_dynamic_uri(char *uri,char *filename,char *cgiargs){
                 strcpy(cgiargs,"");
         }
         strcpy(filename,".");
-        strcpy(filename,uri);
+        strcat(filename,uri);
 }
 
 
@@ -205,5 +228,37 @@ void error_request(int fd,char *cause,char *errnum,char *shortmsg,char *descript
         sprintf(buf,"Content-length: %d\r\n\r\n",(int)strlen(body));
         rio_writen(fd,buf,strlen(buf));
         rio_writen(fd,body,strlen(body));
+}
+
+
+
+// 处理post请求所提交的数据
+void deal_parm_post(char *p, char *cgiargs)
+{
+    int len = strlen(p);
+    char str[2][];
+    // 440 请求头长度（不需要用到的部分）
+    for (int i = 440,int j=0,int k=0; i < len; ++i)
+    {
+        str[k][j++]= p[i];
+        if (p[i])
+        {
+            /* code */
+        }
+    }
+
+
+
+    
+
+    /*if(ptr){
+            strcpy(cgiargs,ptr+1);
+            *ptr='\0';
+    }else{
+            strcpy(cgiargs,"");
+    }
+    strcpy(filename,".");
+    strcat(filename,uri);
+    //printf("222:%s\n", p);*/
 }
 
