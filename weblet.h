@@ -12,7 +12,7 @@ void feed_static(int fd,char *filename,int filesize);
 void get_filetype(char *filename,char *filetype);
 void feed_dynamic(int fd,char *filename,char *cgiargs);
 void error_request(int fd,char *cause,char *errnum,char *shortmsg,char *description);
-
+void deal_parm_post(char *arg, char *cgiargs);
 
 
 #endif

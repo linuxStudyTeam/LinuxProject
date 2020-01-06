@@ -28,7 +28,13 @@ int main(int argc, char **argv)
 	    pthread_create(&tid, NULL, process_thread_function, NULL);
 	while(1){
 		clientlen = sizeof(clientaddr);
+		// 设置存储值
+
+
 		conn_sock = accept(listen_sock,(SA *)&clientaddr,&clientlen);
+		//char *poststr=getenv("CONTENT_LENGTH");
+        //printf("12312:  %s\n",poststr);
+
 		// 因为服务器的网络名字与网络地址基本上是不会变化，所以加了个判断条件，只获取一次，减少没有必要的时间消耗
 		if (sign==1)
 		{
