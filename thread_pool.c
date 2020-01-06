@@ -61,7 +61,7 @@ void *process_thread_function(void *arg)
     while (1) { 
 	    conn_sock=release_thread_of_pool(&tp);   /* 从线程池中挑选出当前线程，并返回该线程所存储的sock值 */
 	    process_trans(conn_sock);            /* 业务处理函数 */
-	    printf("%lu connecte to %s (%s)\n",pthread_self(), hp->h_name, haddrp);
+	    printf("%lu connect to %s (%s)\n",pthread_self(), hp->h_name, haddrp);
 	    close(conn_sock);
     }
 
