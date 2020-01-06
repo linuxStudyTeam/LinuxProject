@@ -8,50 +8,63 @@ void process_trans(int fd){
         char filename[MAXLINE],cgiargs[MAXLINE];
         rio_t rio;
 
-        /*read request line and headers*/
+        /*读取请求行，请求头*/
         rio_readinitb(&rio,fd);
         rio_readlineb(&rio,buf,MAXLINE);
         sscanf(buf,"%s %s %s\n",method,uri,version);
-        // strcasecmp 忽略大小写比较字符串
-        if(strcasecmp(method,"GET")){
-                error_request(fd,method,"501","Not Implemented","weblet does not implement this method");
-                return;
-        }
+        printf("%s\n", method);
+        // strcasecmp 忽略大小写比较字符串 相等返回0
+        if(!strcasecmp(method,"GET")){
+            // GET请求代码
+            read_requesthdrs(&rio);
+            // 判断是否为静态页面
+            static_flag=is_static(uri);
+            if(static_flag){
+                   // printf("静态页面%d\n",static_flag);
+                    parse_static_uri(uri,filename);
+            }else{
+                  //  printf("动态页面%d\n",static_flag);
+                    parse_dynamic_uri(uri,filename,cgiargs);
+            }
+            if(stat(filename,&sbuf)<0){
+                    error_request(fd,filename,"404","Not Found","weblet could not find this file");
+                    return;
+            }
+            if(static_flag){/*feed static content*/
+                    if(!(S_ISREG(sbuf.st_mode))||!(S_IRUSR & sbuf.st_mode)){
+                            error_request(fd,filename,"403","Forbidden","weblet is not permtted to read the file");
+                            return;
+                    }
+                    feed_static(fd,filename,sbuf.st_size);
+            }else{/*feed dynamic content*/
+                    if(!(S_ISREG(sbuf.st_mode))||!(S_IXUSR & sbuf.st_mode)){
+                            error_request(fd,filename,"403","Forbidden","weblet coould not run the CGI progra");
+                            return;
+                    }
+                    feed_dynamic(fd,filename,cgiargs);
+            }
 
-        read_requesthdrs(&rio);
-
-        static_flag=is_static(uri);
-
-        if(static_flag){
-               // printf("静态页面%d\n",static_flag);
-                parse_static_uri(uri,filename);
+        }else if (!strcasecmp(method,"POST"))
+        {
+            // POST请求代码
+            printf("12321\n");
         }else{
-              //  printf("动态页面%d\n",static_flag);
-                parse_dynamic_uri(uri,filename,cgiargs);
+
+            error_request(fd,method,"501","Not Implemented","weblet does not implement this method");
+            return;
         }
 
-        if(stat(filename,&sbuf)<0){
-                error_request(fd,filename,"404","Not Found","weblet could not find this file");
-                return;
-        }
-
-        if(static_flag){/*feed static content*/
-                if(!(S_ISREG(sbuf.st_mode))||!(S_IRUSR & sbuf.st_mode)){
-                        error_request(fd,filename,"403","Forbidden","weblet is not permtted to read the file");
-                        return;
-                }
-                feed_static(fd,filename,sbuf.st_size);
-        }else{/*feed dynamic content*/
-                if(!(S_ISREG(sbuf.st_mode))||!(S_IXUSR & sbuf.st_mode)){
-                        error_request(fd,filename,"403","Forbidden","weblet coould not run the CGI progra");
-                        return;
-                }
-                feed_dynamic(fd,filename,cgiargs);
-        }
+        
 }
 
 int is_static(char *uri){
-        if(!strstr(uri,"cgi-bin"))
+        /*
+            strstr(str1,str2) 函数用于判断字符串str2是否是str1的子串。
+            如果是，则该函数返回 str1字符串从 str2第一次出现的位置开始到 str1结尾的字符串；
+            否则，返回NULL。
+        */
+        // 含有？ 证明有参数传入，即需要做动态响应
+        if(!strstr(uri,"?"))
                 return 1;
         else
                 return 0;
@@ -77,11 +90,14 @@ void read_requesthdrs(rio_t *rp)
 
 void parse_static_uri(char *uri,char *filename)
 {
+        //printf("前： %s\n", filename);
         char *ptr;
         strcpy(filename,".");
         strcat(filename,uri);
-        if(uri[strlen(uri)-1]=='/')
-                strcat(filename,"./WEB/home.html");
+        //printf("后： %s\n", filename);
+
+        /*if(uri[strlen(uri)-1]=='/')
+                strcat(filename,"./WEB/home.html");*/
 }
 
 void parse_dynamic_uri(char *uri,char *filename,char *cgiargs){
@@ -152,10 +168,15 @@ void feed_dynamic(int fd,char *filename,char *cgiargs)
         sprintf(buf,"Server:weblet Web Server\r\n");
         rio_writen(fd,buf,strlen(buf));
         pipe(pfd);
-        if(fork()==0){
-                close(pfd[1]);
+        if(fork()==0){ // 子进程
+                close(pfd[1]); // pfd[0] r; pfd[1] w
                 dup2(pfd[0],STDIN_FILENO);
                 dup2(fd,STDOUT_FILENO);
+                /*
+                    execve()用来执行参数filename字符串所代表的文件路径，
+                    第二个参数是利用指针数组来传递给执行文件，
+                    并且需要以空指针(NULL)结束，最后一个参数则为传递给执行文件的新环境变量数组
+                */
                 execve(filename,emptylist,environ);
         }
 
