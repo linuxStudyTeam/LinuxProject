@@ -2,7 +2,7 @@ all: weblet service
 .PHONY: all
 
 OBJS=weblet.o webletfun.o thread_pool.o
-SERVICE=service.o
+SERVICE=service.o servicefun.o
 
 CC=gcc
 
@@ -24,5 +24,4 @@ ${SERVICE}: %.o: ./serviceCore/%.c
 
 .PHONY:clean
 clean:
-	rm *.o weblet
-	rm ./serviceCore/*.o service
+	rm *.o weblet service
