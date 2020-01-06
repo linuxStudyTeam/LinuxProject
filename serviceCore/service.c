@@ -1,14 +1,14 @@
-#include "../wrapper.h"
+#include "service.h"
 
 int main(int argc, char const *argv[])
 {
-	char *buf, *p, *name, *password;
-    char content[MAXLINE];
-    
+	char *buf, *p;
+    char content[MAXLINE],name[MAXLINE/2], password[MAXLINE/2],op;
 
-    /* Extract the two arguments from standard input */
-    scanf("%s&%sd", name, password);
-    
+
+    // 读取数据
+    readData(name,password,&op);
+
     /* Make the response body */
     sprintf(content, "Welcome to add.com: ");
     sprintf(content, "%sTHE Internet addition portal.\r\n<p>", content);
