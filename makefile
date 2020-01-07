@@ -1,27 +1,27 @@
-all: weblet service
+all: weblet loginService
 .PHONY: all
 
 OBJS=weblet.o webletfun.o thread_pool.o
-SERVICE=service.o servicefun.o
+LOGINSERVICE=loginService.o servicefun.o
 
 CC=gcc
 
 
 weblet: ${OBJS}
-	${CC} -o $@ $^ -Bstatic -L. -lwrapper -lpthread 	
+	${CC} -o $@ $^ -Bstatic -L./tools -lwrapper -lpthread 	
 
-${OBJS}: %.o: %.c
+${OBJS}: %.o: ./projectEntry/%.c
 	${CC} -c $< -o $@ 
 
 
 
-service: ${SERVICE}
-	${CC} -o $@ $^ -Bstatic -L. -lwrapper
-${SERVICE}: %.o: ./serviceCore/%.c
+loginService: ${LOGINSERVICE}
+	${CC} -o $@ $^ -Bstatic -L./tools -lwrapper
+${LOGINSERVICE}: %.o: ./serviceCore/%.c
 	${CC} -c $< -o $@ 
 
 
 
 .PHONY:clean
 clean:
-	rm *.o weblet service
+	rm *.o weblet loginService
