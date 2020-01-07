@@ -2,9 +2,9 @@
 #define SERVICE_H_INCLUDED
 
 
-#include "../wrapper.h"
+#include "../tools/wrapper.h"
 
-void readData(char* name, char* pad,char* op);
-
+void readDataByGet(char* name, char* pwd,char* op);
+void readDataLoginByPost(char* name, char* pwd);
 
 #endif
