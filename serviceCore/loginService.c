@@ -3,22 +3,25 @@ int main(int argc, char const *argv[])
 {
 	char *buf, *p;
     char content[MAXLINE],name[MAXLINE/2], password[MAXLINE/2];
-
+    int sign = 0;
 
     // 读取数据
     readDataLoginByPost(name,password);
 
-    /* Make the response body */
-    sprintf(content, "Welcome to add.com: ");
-    sprintf(content, "%sTHE Internet addition portal.\r\n<p>", content);
-    sprintf(content, "%syour name is %s, your passord is %s\r\n<p>", 
-	    content, name, password);
-    sprintf(content, "%sThanks for visiting!\r\n", content);
+    sign = comfirmUser(name,password);
 
-    /* Generate the HTTP response */
-    printf("Content-length: %d\r\n", strlen(content));
-    printf("Content-type: text/html\r\n\r\n");
-    printf("%s", content);
-    fflush(stdout);
+    if (sign==1)
+    {
+        // 登录成功页面 
+        loginSucceed(name,password);
+
+    }else if(sign==2){
+        // 登录失败页面(用户名输错)
+        loginFailed(USER_ERROR);
+
+    }else {
+        // 登录失败页面(密码输错)
+        loginFailed(PWD_ERROR);
+    }
     exit(0);
 }
