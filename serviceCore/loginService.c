@@ -6,7 +6,7 @@ int main(int argc, char const *argv[])
     int sign = 0;
 
     // 读取数据
-    readDataLoginByPost(name,password);
+    readData(name,password,NULL);
 
     sign = comfirmUser(name,password);
 
