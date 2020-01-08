@@ -110,8 +110,8 @@ void parse_static_uri(char *uri,char *filename)
         strcat(filename,uri);
         //printf("后： %s\n", filename);
 
-        /*if(uri[strlen(uri)-1]=='/')
-                strcat(filename,"./WEB/home.html");*/
+        if(uri[strlen(uri)-1]=='/')
+                strcat(filename,"./WEB/home.html");
 }
 
 void parse_dynamic_uri(char *uri,char *filename,char *cgiargs){
@@ -209,8 +209,8 @@ void error_request(int fd,char *cause,char *errnum,char *shortmsg,char *descript
         /*build the http response body*/
         sprintf(body,"<html><title>error request</title>");
         sprintf(body,"%s<body bgcolor=""ffffff"">\r\n",body);
-        sprintf(body,"%s %s:%s\r\n",body,errnum,shortmsg);
-        sprintf(body,"%s<p>%s:%s\r\n",body,description,cause);
+        sprintf(body,"%s<div style='text-align:center;margin-top:200px'>%s:%s</div>\r\n",body,errnum,shortmsg);
+        sprintf(body,"%s<div style='text-align:center'>%s:%s</div>\r\n",body,description,cause);
         /*send the http respose*/
         sprintf(buf,"HTTP/1.0 %s %s\r\n",errnum,shortmsg);
         rio_writen(fd,buf,strlen(buf));
