@@ -140,14 +140,15 @@ void resultDisplay(int firstNum,int secondNum,char type){
 
 char convertStrToInt(char *str_num,int *int_num){
 	char content[MAXLINE];
-	int i,j,len = strlen(str_num);
+	int i,j,len = strlen(str_num),temp;
 	for(i=0;i<len;i++){
 		if (isdigit(str_num[i])) {
-			str_num[i] = str_num[i] - 48;
-			for(j=0;j<len-i-1;j++){
-				str_num[i] *= 10;	
+			temp = str_num[i] - 48; // 隐式转换
+			for(j=1;j<=len-i-1;j++){
+				temp *= 10;	
 			}
-			*int_num += str_num[i];
+			*int_num += temp;
+			
 	    }else {
 	    	return CONVERT_FAILED;  
 	    }
