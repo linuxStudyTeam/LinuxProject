@@ -6,19 +6,27 @@
 
 	</head>
 	<body>
-		<form action="../loginService" method="post">
-			<div>
-				<span>用户名：</span><input type="text" name="username" />
-				<span>密码：</span><input type="password" name="password" />
+		<div style="height: 500px;">
+			<div style="width:400px;margin: auto;margin-top: 200px;">
+				<form action="../loginService" method="post">
+					<table>
+						<tr>
+							<td><span>用户名：</span></td>
+							<td><input type="text" name="username" /></td>
+						</tr>
+						<tr>
+							<td><span>密码：</span></td>
+							<td><input type="password" name="password" /></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td style="float: right;"><input type="reset" value="重置"/><input type="submit" value="提交"/></td>
+						</tr>
+
+					</table>
+				</form>
 			</div>
-			<!--<div>
-				<input type="hidden" name="op" value="1">
-			</div>-->
-			<div>
-				<input type="reset" value="重置"/>
-				<input type="submit" value="提交"/>
-			</div>
-		</form>
+		</div>
 	</body>
 	</html>
 
